@@ -1,6 +1,8 @@
 default[:zookeeper][:cluster_name] = "default"
 
 # ZK defaults
+default[:zookeeper][:user] = "zookeeper"
+default[:zookeeper][:group] = "zookeeper"
 default[:zookeeper][:tick_time] = 2000
 default[:zookeeper][:init_limit] = 10
 default[:zookeeper][:sync_limit] = 5
@@ -11,5 +13,19 @@ default[:zookeeper][:leader_port] = 3888
 default[:zookeeper][:data_dir] = "/var/lib/zookeeper/data"
 default[:zookeeper][:version] = "3.4.5"
 
+default[:zookeeper][:autorun_ebs_volume_recipe] = false
+
 default[:zookeeper][:ebs_vol_dev] = "/dev/sdp"
 default[:zookeeper][:ebs_vol_size] = 10
+
+
+# ZK Cluster defaults
+default[:zookeeper][:cluster_servers] = [{ 
+  :name => node[:hostname],
+  :zookeeper => { 
+    :ipaddress => 'localhost',
+    :fqdn => node[:fqdn], 
+    :peer_port => node[:zookeeper][:peer_port],
+    :leader_port => node[:zookeeper][:leader_port]
+  }
+}] 

@@ -25,9 +25,11 @@ remote_file "/tmp/zookeeper-#{node[:zookeeper][:version]}.tar.gz" do
   mode "0644"
 end
 
-user "zookeeper" do
+group node[:zookeeper][:group]
+
+user node[:zookeeper][:user] do
   uid 61001
-  gid "nogroup"
+  gid node[:zookeeper][:group]
 end
 
 ["/usr/lib/zookeeper-#{node[:zookeeper][:version]}", "/etc/zookeeper"].each do |dir|
@@ -40,16 +42,16 @@ end
 
 ["/var/log/zookeeper", "/var/lib/zookeeper"].each do |dir|
   directory dir do
-    owner "zookeeper"
-    group "nogroup"
+    owner node[:zookeeper][:user]
+    group node[:zookeeper][:group]
     mode 0755
   end
 end
 
 if node[:ec2]
   directory "/mnt/zookeeper" do
-    owner "zookeeper"
-    group "nogroup"
+    owner node[:zookeeper][:user]
+    group node[:zookeeper][:group]
     mode 0755
   end
 
@@ -97,7 +99,14 @@ if node.role?("zookeeper")
 else
   zk_servers = []
 end
-zk_servers += search(:node, "role:zookeeper AND chef_environment:#{node.chef_environment} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
+
+if not Chef::Config.solo
+  zk_servers += search(:node, "role:zookeeper AND chef_environment:#{node.chef_environment} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
+elsif node.role?("zookeeper") && node[:zookeeper][:cluster_servers].length > 0
+  zk_servers += node[:zookeeper][:cluster_servers].select { |s| s[:name] != node[:hostname] && s[:ipaddress] != 'localhost' && s[:ipaddress] != '127.0.0.1' } # don't include this one, since it's already in the list
+elsif node[:zookeeper][:cluster_servers].length > 0
+  zk_servers += node[:zookeeper][:cluster_servers]
+end
 
 zk_servers.sort! { |a, b| a.name <=> b.name }
 
@@ -107,12 +116,14 @@ template "/etc/zookeeper/zoo.cfg" do
   variables(:servers => zk_servers)
 end
 
-include_recipe "zookeeper::ebs_volume"
+if node[:zookeeper][:autorun_ebs_volume_recipe]
+  include_recipe "zookeeper::ebs_volume"
+end
 
 directory node[:zookeeper][:data_dir] do
   recursive true
-  owner "zookeeper"
-  group "nogroup"
+  owner node[:zookeeper][:user]
+  group node[:zookeeper][:group]
   mode 0755
 end
 
@@ -120,8 +131,8 @@ myid = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
 
 template "#{node[:zookeeper][:data_dir]}/myid" do
   source "myid.erb"
-  owner "zookeeper"
-  group "nogroup"
+  owner node[:zookeeper][:user]
+  group node[:zookeeper][:group]
   variables(:myid => myid)
 end
 

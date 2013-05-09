@@ -97,8 +97,8 @@ if node[:ec2]
   end
   
   directory mount_point do
-    owner "zookeeper"
-    group "nogroup"
+    owner node[:zookeeper][:user]
+    group node[:zookeeper][:group]
     mode 0755
   end
 
@@ -110,8 +110,8 @@ if node[:ec2]
   end
 
   directory data_dir do
-    owner "zookeeper"
-    group "nogroup"
+    owner node[:zookeeper][:user]
+    group node[:zookeeper][:group]
     mode 0755
     recursive true
   end
