@@ -18,9 +18,9 @@ default[:zookeeper][:autorun_ebs_volume_recipe] = false
 default[:zookeeper][:ebs_vol_dev] = "/dev/sdp"
 default[:zookeeper][:ebs_vol_size] = 10
 
-
+default[:zookeeper][:search_cluster_servers] = not Chef::Config.solo or node.recipes.include?("chef-solo-search")
 # ZK Cluster defaults
-default[:zookeeper][:cluster_servers] = [{ 
+default[:zookeeper][:cluster_servers] = [{
   :name => node[:hostname],
   :zookeeper => { 
     :ipaddress => 'localhost',
