@@ -94,18 +94,15 @@ template "/etc/zookeeper/log4j.properties" do
   mode 0644
 end
 
-if node.role?("zookeeper")
-  zk_servers = [node]
-else
-  zk_servers = []
-end
+zk_servers = []
 
-if not Chef::Config.solo
+if node[:zookeeper][:search_cluster_servers]
   zk_servers += search(:node, "role:zookeeper AND chef_environment:#{node.chef_environment} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
-elsif node.role?("zookeeper") && node[:zookeeper][:cluster_servers].length > 0
+elsif node[:zookeeper][:auto_add_current_node]
+  zk_servers = [node]
   zk_servers += node[:zookeeper][:cluster_servers].select { |s| s[:name] != node[:hostname] && s[:ipaddress] != 'localhost' && s[:ipaddress] != '127.0.0.1' } # don't include this one, since it's already in the list
-elsif node[:zookeeper][:cluster_servers].length > 0
-  zk_servers += node[:zookeeper][:cluster_servers]
+else
+  zk_servers = node[:zookeeper][:cluster_servers]
 end
 
 zk_servers.sort! { |a, b| a.name <=> b.name }
