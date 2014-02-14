@@ -102,7 +102,7 @@ elsif node[:zookeeper][:auto_add_current_node]
   zk_servers = [node]
   zk_servers += node[:zookeeper][:cluster_servers].select { |s| s[:name] != node[:hostname] && s[:ipaddress] != 'localhost' && s[:ipaddress] != '127.0.0.1' } # don't include this one, since it's already in the list
 else
-  zk_servers = node[:zookeeper][:cluster_servers]
+  zk_servers += node[:zookeeper][:cluster_servers]
 end
 
 zk_servers.sort! { |a, b| a.name <=> b.name }
