@@ -124,7 +124,7 @@ directory node[:zookeeper][:data_dir] do
   mode 0755
 end
 
-myid = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
+myid = zk_servers.collect { |n| n[:zookeeper][:ipaddress] }.index(node[:zookeeper][:ipaddress])
 
 template "#{node[:zookeeper][:data_dir]}/myid" do
   source "myid.erb"
