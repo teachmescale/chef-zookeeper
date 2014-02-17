@@ -18,9 +18,9 @@ clientPort=<%= @node[:zookeeper][:client_port] %>
 
 <% if @servers.size > 1 -%>
   <% @servers.each_with_index do |server, i| %>
-server.<%= i %>=<%= server[:ipaddress] %>:<%= server[:zookeeper][:peer_port] %>:<%= server[:zookeeper][:leader_port] %>
+server.<%= i+1 %>=<%= server[:zookeeper][:ipaddress] %>:<%= server[:zookeeper][:peer_port] %>:<%= server[:zookeeper][:leader_port] %>
   <% end -%>
 <% else -%>
   <% server = @servers.first -%>
-server=<%= server[:ipaddress] %>:<%= server[:zookeeper][:peer_port] %>:<%= server[:zookeeper][:leader_port] %>
+server=<%= server[:zookeeper][:ipaddress] %>:<%= server[:zookeeper][:peer_port] %>:<%= server[:zookeeper][:leader_port] %>
 <% end -%>
