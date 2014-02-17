@@ -127,7 +127,7 @@ end
 if node[:zookeeper][:myid] != 0
   myid = node[:zookeeper][:myid]
 else
-  myid = 1 + zk_servers.index { |n| n[:zookeeper][:ipaddress] == node[:ipaddress] } or 0
+  myid = 1 + (zk_servers.index { |n| n[:zookeeper][:ipaddress] == node[:ipaddress] } or 0)
 end
 
 template "#{node[:zookeeper][:data_dir]}/myid" do
