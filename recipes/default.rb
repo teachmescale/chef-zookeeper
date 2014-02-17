@@ -124,7 +124,7 @@ directory node[:zookeeper][:data_dir] do
   mode 0755
 end
 
-if node[:zookeeper][:myid]
+if node[:zookeeper][:myid] != 0
   myid = node[:zookeeper][:myid]
 else
   myid = 1 + zk_servers.index { |n| n[:zookeeper][:ipaddress] == node[:ipaddress] } or 0

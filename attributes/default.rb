@@ -3,7 +3,7 @@ default[:zookeeper][:cluster_name] = "default"
 # ZK defaults
 default[:zookeeper][:user] = "zookeeper"
 default[:zookeeper][:group] = "zookeeper"
-default[:zookeeper][:myid] = nil
+default[:zookeeper][:myid] = 0
 default[:zookeeper][:tick_time] = 2000
 default[:zookeeper][:init_limit] = 10
 default[:zookeeper][:sync_limit] = 5
